@@ -5,7 +5,7 @@ inherit git-r3
 DESCRIPTION="Rockchip U-boot"
 SRC_URI=""
 EGIT_REPO_URI="https://github.com/FydeOS-for-You-overlays/uboot-bin-for-pinebookpro.git"
-EGIT_BRANCH="rock-pi4"
+EGIT_BRANCH="rs124"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="-* arm64 arm"
