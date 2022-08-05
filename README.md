@@ -1,6 +1,6 @@
-# overlay-rockpi4b-openfyde
+# overlay-rs124-openfyde
 
-![Logo badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fopenfyde-badge-wivuxrq8xzvh.runkit.sh%2F) ![Release badge](https://img.shields.io/github/v/release/openFyde/overlay-rockpi4b-openfyde?label=latest%20release%20image)
+![Logo badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fopenfyde-badge-wivuxrq8xzvh.runkit.sh%2F) ![Release badge](https://img.shields.io/github/v/release/openFyde/overlay-rs124-openfyde?label=latest%20release%20image)
 
 <br>
 
@@ -14,26 +14,22 @@ Each board has a corresponding **overlay** that defines the configuration for it
 <br>
 
 ## About this repository
-This repository is the overlay for the `rockpi4b-openfyde` board, it's part of the openFyde open-source project.
+This repository is the overlay for the `rs124-openfyde` board, it's part of the openFyde open-source project.
 
 This repository contains the following packages:
 
-| Packages                   | Description            | Reference |
-|----------------------------|------------------------|-----------|
-| chromeos-base/device-appid | Setup device appid     |           |
-| virtual/fydeos-board-spec  | Setup board dependency |           |
-
+| Packages                         | Description		| Reference |
+|----------------------------------|----------------------------|-----------|
+| chromeos-base/device-appid       | Setup device appid         |           |
+| virtual/fydeos-board-spec        | Setup board dependency     |           |
+| virtual/fydeos-board-spec        | Setup board dependency     |           |
+| chromeos-base/chromeos-bsp-rs124 | Setup board audio configs  |           |
+| sys-kernel/rockchip-kernel       | rs124 specific kernel      |           |
+| kconfigs/fydeos-r96-4_4-def      | kernel config              |	    |
 
 <br>
 
-## About the board `rockpi4b-openfyde`
- - This board specifically targets the [Rock Pi 4 model B](https://rockpi.org/rockpi4):
-
-    ![Rock Pi 4B](https://rockpi.org/assets/images/rockpi_4B_v13_breadboard_front.svg)
-
- - Rock Pi 4 Model A and C should also be compatible
- - [Rock Pi 4 Model C+](https://dl.radxa.com/rockpi4/docs/hw/rockpi4/rockpi4c_plus_product_brief.pdf) is not compatible with this board
- 
+## About the board `rs124-openfyde`
 
 <br>
 
