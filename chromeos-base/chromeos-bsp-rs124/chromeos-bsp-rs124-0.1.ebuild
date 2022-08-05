@@ -22,8 +22,9 @@ S="${WORKDIR}"
 src_install() {
   insinto /etc/init
   doins "${FILESDIR}/upstart/cras_plug_hdmi.conf"
-  insinto "/usr/bin/"
-  doins "${FILESDIR}"/scripts/*
+
+  exeinto "/usr/bin/"
+  doexe "${FILESDIR}"/scripts/*
 
   local audio_config_dir="${FILESDIR}/audio-config"
   install_audio_configs kevin "${audio_config_dir}"
