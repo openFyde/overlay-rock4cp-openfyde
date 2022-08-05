@@ -4,7 +4,7 @@
 EAPI="5"
 
 inherit appid2
-DESCRIPTION="empty project"
+DESCRIPTION="device appid"
 HOMEPAGE="http://fydeos.com"
 
 LICENSE="BSD-Google"
@@ -19,5 +19,5 @@ DEPEND="${RDEPEND}"
 S="${WORKDIR}"
 
 src_install() {
-      doappid "{702F9595-DF17-42B7-BEEE-4A98EA404A42}" "CHROMEBOOK" "{552F8705-D588-43F8-8B17-CA199136982d}"
+      doappid "{702F0101-DF17-42B7-BEEE-4B98EA404A42}" "CHROMEBOOK" "{552F8705-D588-43F8-8B17-CA199136982d}"
 }
