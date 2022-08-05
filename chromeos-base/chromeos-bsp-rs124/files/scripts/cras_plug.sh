@@ -36,7 +36,7 @@ wait_for_output_nodes()
 
 device_node_number()
 {
-    cras_test_client | grep $1 | sed  's/\t/ /g' |  tr -s ' ' | sed 's/ /\n/g' | grep :
+    cras_test_client | grep $1 | head -n 1 | sed  's/\t/ /g' |  tr -s ' ' | sed 's/ /\n/g' | grep :
 }
 
 plug_node()
