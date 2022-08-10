@@ -10,7 +10,6 @@ chromeos-base/cros-disks::chromiumos
 chromeos-base/cros-disks::openfyde-patches
 chromeos-base/chromeos-installer::chromiumos
 chromeos-base/chromeos-installer::openfyde-patches
-chromeos-base/chromeos-chrome::openfyde-patches
 chromeos-base/auto-expand-partition::openfyde
 sys-boot/rockchip-uboot::baseboard-rockpi4
 sys-kernel/rockchip-kernel::chipset-rk3399-openfyde
