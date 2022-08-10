@@ -15,11 +15,10 @@ RDEPEND="
     chromeos-base/auto-expand-partition
     sys-apps/haveged
     virtual/fydemina
-    chromeos-base/chromeos-bsp-rockpi4b
+    chromeos-base/fydeos-power-daemon-go
+    chromeos-base/device-appid
+    chromeos-base/chromeos-bsp-rockpi4
+    chromeos-base/chromeos-bsp-rs124
 "
-
-#    chromeos-base/intel-microcode
-#    sys-firmware/b43-firmware
-#    chromeos-base/common-usb-camera-config
 
 DEPEND="${RDEPEND}"
