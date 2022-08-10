@@ -18,7 +18,7 @@ RDEPEND="
     chromeos-base/fydeos-power-daemon-go
     chromeos-base/device-appid
     chromeos-base/chromeos-bsp-rockpi4
-    chromeos-base/chromeos-bsp-rs124
+    chromeos-base/chromeos-bsp-rockpi4cplus
 "
 
 DEPEND="${RDEPEND}"
