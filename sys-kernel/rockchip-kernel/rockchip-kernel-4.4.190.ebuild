@@ -48,25 +48,7 @@ src_install() {
   local kernel_version=$(kmake -s kernelversion)
 
   info "Install /boot/dtbs/"
-	kmake INSTALL_DTBS_PATH="${D}/boot/dtbs/$(kernelrelease)" dtbs_install
+  kmake INSTALL_DTBS_PATH="${D}/boot/dtbs/" dtbs_install
 
-  info "Install ${D}/boot/extlinux.conf"
-  cat > "${kernel_dir}/extlinux.conf" <<EOF
-menu title Boot Menu
-timeout 20
-default rockchip-${kernel_release}-debug
-
-label rockchip-${kernel_release}-debug
-    kernel /boot/Image-${kernel_release}
-    devicetreedir /boot/dtbs/${kernel_release}
-    append earlyprintk console=ttyS2,1500000n8 ro root=/dev/\${bootdevice}p\${bootdevice_part} rootfstype=ext4 init=/sbin/init rootwait cros_debug loglevel=7 dm_verity.error_behavior=3 dm_verity.max_bios=-1 dm_verity.dev_wait=0 dm="1 vroot none ro 1, 0 2539520 verity payload=/dev/\${bootdevice}p\${bootdevice_part} hashtree=HASH_DEV hashstart=2539520 alg=sha1 root_hexdigest=a1910fbe4a24a30d19a49b85d2889776251e54e3 salt=c520b38f1057e5bef0aa64c00cd0d2e50662e22bf19771278921f90a35fd616d" vt.global_cursor_default=0 ethaddr=\${ethaddr} serial=\${serial#} cgroup.memory=nokmem cros_legacy panic=0 cma=1024M
-
-label rockchip-${kernel_release}
-    kernel /boot/Image-${kernel_release}
-    devicetreedir /boot/dtbs/${kernel_release}
-    append earlyprintk console=ttyS2,1500000n8 ro root=/dev/\${bootdevice}p\${bootdevice_part} rootfstype=ext4 init=/sbin/init rootwait loglevel=7 dm_verity.error_behavior=3 dm_verity.max_bios=-1 dm_verity.dev_wait=0 dm="1 vroot none ro 1,0 2539520 verity payload=/dev/\${bootdevice}p\${bootdevice_part} hashtree=HASH_DEV hashstart=2539520 alg=sha1 root_hexdigest=a1910fbe4a24a30d19a49b85d2889776251e54e3 salt=c520b38f1057e5bef0aa64c00cd0d2e50662e22bf19771278921f90a35fd616d" vt.global_cursor_default=0 ethaddr=\${ethaddr} serial=\${serial#} cgroup.memory=nokmem cros_legacy panic=0 cma=1024M
-EOF
-
-  insinto "/boot/extlinux"
-  doins "${kernel_dir}/extlinux.conf"
+  dosym /boot/Image-${kernel_release} /boot/Image
 }
