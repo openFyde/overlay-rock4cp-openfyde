@@ -1,36 +1,16 @@
 echo "Detected i2c4@62 charger circuit."
 echo "It seems to be a rock pi."
 
-setenv fdtfile rockchip/rk3399-radxa-keyz.dtb
+setenv fdtfile /boot/dtbs/rockchip/rk3399-radxa-keyz.dtb
 
-# Detect bootdevice
-if test "${devtype}${devnum}" = "mmc0"; then
-  setenv bootdevice mmcblk1 # SDHCI
-elif test "${devtype}${devnum}" = "mmc1"; then
-  setenv bootdevice mmcblk0 # SD
-else
-  setenv bootdevice sda # USB?
+setenv rootpart 3
+setenv linux_image /boot/Image
+if test -e ${devtype} ${devnum}:${distro_bootpart} /boot/first-b.txt; then
+  setenv rootpart 5
 fi
 
-echo "FDT: ${fdtfile}"
-echo "Bootdevice: ${bootdevice}"
-
-if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}/first-b.txt; then
-  echo "Found ${prefix}/first-b.txt, trying ROOT-B first"
-  setenv prefix /boot/
-  setenv distro_bootpart 5
-  setenv bootdevice_part 5
-  run boot_extlinux
-fi
-
-# Scan ROOT-A
-setenv prefix /boot/
-setenv distro_bootpart 3
-setenv bootdevice_part 3
-run boot_extlinux
-
-# Scan ROOT-B
-setenv prefix /boot/
-setenv distro_bootpart 5
-setenv bootdevice_part 5
-run boot_extlinux
+part uuid ${devtype} ${devnum}:${rootpart} root_uuid
+setenv bootargs rootwait ro cros_debug cros_secure cros_legacy console=ttyS2,1500000n8 root=PARTUUID=${root_uuid}
+load ${devtype} ${devnum}:${rootpart} ${kernel_addr_r} ${linux_image}
+load ${devtype} ${devnum}:${rootpart} ${fdt_addr_r} ${fdtfile}
+booti ${kernel_addr_r} - ${fdt_addr_r}

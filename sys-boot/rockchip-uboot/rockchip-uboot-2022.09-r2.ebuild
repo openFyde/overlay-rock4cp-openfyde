@@ -1,0 +1,1 @@
+rockchip-uboot-2022.09.ebuild
