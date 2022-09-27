@@ -1,1 +1,1 @@
-chromeos-base/cryptohome -direncription_allow_v2
+chromeos-base/cryptohome -direncription_allow_v2 lvm_stateful_partition
