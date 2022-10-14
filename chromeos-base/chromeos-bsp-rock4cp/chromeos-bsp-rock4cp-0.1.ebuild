@@ -13,7 +13,9 @@ SLOT="0"
 KEYWORDS="*"
 IUSE=""
 
-RDEPEND=""
+RDEPEND="
+chromeos-base/dtbo-scripts
+"
 
 DEPEND="${RDEPEND}"
 
