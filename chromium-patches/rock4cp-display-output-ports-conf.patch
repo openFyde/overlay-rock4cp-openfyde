@@ -1,0 +1,266 @@
+From: Fangzhou Chen <fangzhou@fydeos.io>
+Date: Fri, 14 Oct 2022 02:46:46 +0000
+Subject: Add UI in os-settings for display output ports configuration
+Signed-off-by: Fangzhou Chen <fangzhou@fydeos.io>
+
+useful for board `rock4cp-openfyde` and `rock4cp-fydeos`.
+
+diff --git a/chrome/browser/resources/settings/chromeos/device_page/display.html b/chrome/browser/resources/settings/chromeos/device_page/display.html
+index 6c19ebacc6fdb..ee6614d138b2f 100644
+--- a/chrome/browser/resources/settings/chromeos/device_page/display.html
++++ b/chrome/browser/resources/settings/chromeos/device_page/display.html
+@@ -166,6 +166,22 @@
+     </settings-slider>
+   </div>
+ 
++  <div class="settings-box indented two-line" hidden=[[!showDisplayOutputPortsControl_]]>
++    <div class="start text-area layout vertical" aria-hidden="true">
++      <div>$i18n{displayOutputPortsTitle}</div>
++      <div class="secondary self-start" id="displayOutputPortsSublabel">
++        $i18n{displayOutputPortsSublabel}
++      </div>
++    </div>
++    <select class="md-select"
++        value="[[selectedOutputPorts_]]"
++        aria-labelledby="displayOutputPortsSublabel"
++        on-change="onOutputPortsChanged_">
++      <template is="dom-repeat" items="[[outputPortsCombinationList_]]">
++        <option value="[[item.value]]">[[item.name]]</option>
++      </template>
++    </select>
++  </div>
+   <!-- Drop down select menu for resolution -->
+   <template is="dom-if"
+       if="[[showDropDownResolutionSetting_(selectedDisplay)]]" restamp>
+diff --git a/chrome/browser/resources/settings/chromeos/device_page/display.js b/chrome/browser/resources/settings/chromeos/device_page/display.js
+index 6a090c29b4168..dcff27b64a838 100644
+--- a/chrome/browser/resources/settings/chromeos/device_page/display.js
++++ b/chrome/browser/resources/settings/chromeos/device_page/display.js
+@@ -61,6 +61,85 @@ const NightLightScheduleType = {
+   CUSTOM: 2,
+ };
+ 
++/*
++ * @enum {number}
++ */
++const DisplayOutputPortsCombinations = {
++  VGA_AND_HDMI: 0,
++  HDMI_AND_TYPE_C: 1,
++};
++
++class DisplayOutputPortsController {
++  static get COMMAND() {
++    return '/usr/bin/dtbo';
++  }
++  static get VGA_AND_HDMI_COMMAND_PARAMS() {
++    return 'vga on';
++  }
++  static get HDMI_AND_TYPE_C_COMMAND_PARAMS() {
++    return 'vga off';
++  }
++  static get STATUS_PARAMS() {
++    return 'vga status';
++  }
++  static get COMMAND_STATUS_VGA_AND_HDMI_INDICATOR() {
++    return 'VGA is enabled';
++  }
++  static get COMMAND_STATUS_HDMI_AND_TYPE_C_INDICATOR() {
++    return 'VGA is disabled';
++  }
++  rawRunCommand_(cmd) {
++    return new Promise((resolve, reject) => {
++      chrome.shellClient.execSync(cmd, ({code, result}) => {
++        if (code !== 0) {
++          reject(new Error(result || `exit code ${code}`));
++        } else {
++          resolve(result);
++        }
++      });
++    });
++  }
++  async runCommand_(paramsString) {
++    const cmd = `${DisplayOutputPortsController.COMMAND} ${paramsString}`;
++    try {
++      const result = await this.rawRunCommand_(cmd);
++      return result.trim();
++    } catch (err) {
++      console.log(`run command ${cmd} failed: ${err}`);
++      return '';
++    }
++  }
++  async isSupported() {
++    try {
++      const ret = await this.rawRunCommand_(`ls ${DisplayOutputPortsController.COMMAND}`);
++      return ret.indexOf(DisplayOutputPortsController.COMMAND) !== -1;
++    } catch (err) {
++      console.log(`check display output ports support failed: ${err}`);
++      return false;
++    }
++  }
++  async getOutputPorts() {
++    const ret = await this.runCommand_(DisplayOutputPortsController.STATUS_PARAMS);
++    if (ret.indexOf(DisplayOutputPortsController.COMMAND_STATUS_VGA_AND_HDMI_INDICATOR) !== -1) {
++      return DisplayOutputPortsCombinations.VGA_AND_HDMI;
++    } else if (ret.indexOf(DisplayOutputPortsController.COMMAND_STATUS_HDMI_AND_TYPE_C_INDICATOR) !== -1) {
++      return DisplayOutputPortsCombinations.HDMI_AND_TYPE_C;
++    } else {
++      console.log(`unknown output ports status: ${ret}`);
++      return -1;
++    }
++  }
++  async setOutputPorts(combination) {
++    if (combination === DisplayOutputPortsCombinations.VGA_AND_HDMI) {
++      this.runCommand_(DisplayOutputPortsController.VGA_AND_HDMI_COMMAND_PARAMS);
++    } else if (combination === DisplayOutputPortsCombinations.HDMI_AND_TYPE_C) {
++      this.runCommand_(DisplayOutputPortsController.HDMI_AND_TYPE_C_COMMAND_PARAMS);
++    } else {
++      console.log('unknown output ports combination');
++    }
++  }
++}
++
+ Polymer({
+   _template: html`{__html_template__}`,
+   is: 'settings-display',
+@@ -224,6 +303,33 @@ Polymer({
+       },
+     },
+ 
++    /** @private */
++    outputPortsCombinationList_: {
++      type: Array,
++      value() {
++        return [
++          {
++            name: 'VGA + HDMI',
++            value: DisplayOutputPortsCombinations.VGA_AND_HDMI,
++          },
++          {
++            name: 'HDMI + TYPE-C',
++            value: DisplayOutputPortsCombinations.HDMI_AND_TYPE_C,
++          },
++        ];
++      },
++    },
++
++    selectedOutputPorts_: {
++      type: Number,
++      value: -1,
++    },
++
++    showDisplayOutputPortsControl_: {
++      type: Boolean,
++      value: true,
++    },
++
+     /** @private */
+     shouldOpenCustomScheduleCollapse_: {
+       type: Boolean,
+@@ -307,6 +413,9 @@ Polymer({
+   /** @private {?DevicePageBrowserProxy} */
+   browserProxy_: null,
+ 
++  /** @private {DisplayOutputPortsController} */
++  displayOutputPortsController_: null,
++
+   /** @private {string} */
+   invalidDisplayId_: loadTimeData.getString('invalidDisplayId'),
+ 
+@@ -333,6 +442,7 @@ Polymer({
+   /** @override */
+   created() {
+     this.browserProxy_ = DevicePageBrowserProxyImpl.getInstance();
++    this.displayOutputPortsController_ = new DisplayOutputPortsController();
+   },
+ 
+   /** @override */
+@@ -343,6 +453,7 @@ Polymer({
+ 
+     this.getDisplayInfo_();
+     this.$.displaySizeSlider.updateValueInstantly = false;
++    this.initDisplayOutputPortsControl_();
+   },
+ 
+   /** @override */
+@@ -1496,4 +1607,39 @@ Polymer({
+           this.displays, this.layouts, this.mirroringDestinationIds);
+     }
+   },
++
++  async initDisplayOutputPortsControl_() {
++    const isSupported = await this.displayOutputPortsController_.isSupported();
++    const boardKey = 'aboutFydeOSBoardName';
++    if (!loadTimeData.valueExists(boardKey)) {
++      this.showDisplayOutputPortsControl_ = isSupported;
++    } else {
++      const board = loadTimeData.getString(boardKey);
++      this.showDisplayOutputPortsControl_ = isSupported && (board.startsWith('rock4cp') !== -1);
++    }
++
++    if (this.showDisplayOutputPortsControl_) {
++      this.getDisplayOutputPorts_();
++    }
++  },
++
++  async onOutputPortsChanged_(event) {
++    const target = /** @type {!HTMLSelectElement} */ (event.target);
++    const value = /** @type {number} */ (parseInt(target.value, 10));
++
++    this.selectedOutputPorts_ = value;
++    await this.setDisplayOutputPorts_(value);
++    // always get the value again, in case the `set` call failed.
++    this.getDisplayOutputPorts_();
++  },
++
++  async getDisplayOutputPorts_() {
++    this.selectedOutputPorts_ = await this.displayOutputPortsController_.getOutputPorts();
++    console.log('getDisplayOutputPorts_ ', this.selectedOutputPorts_);
++  },
++
++  async setDisplayOutputPorts_(combination) {
++    console.log('setDisplayOutputPorts_ ', combination);
++    await this.displayOutputPortsController_.setOutputPorts(combination);
++  }
+ });
+diff --git a/chrome/browser/ui/webui/settings/chromeos/device_section.cc b/chrome/browser/ui/webui/settings/chromeos/device_section.cc
+index 0e8896ce96e56..86535b2af379d 100644
+--- a/chrome/browser/ui/webui/settings/chromeos/device_section.cc
++++ b/chrome/browser/ui/webui/settings/chromeos/device_section.cc
+@@ -639,6 +639,8 @@ void AddDeviceDisplayStrings(content::WebUIDataSource* html_source) {
+       {"displayUnifiedDesktop", IDS_SETTINGS_DISPLAY_UNIFIED_DESKTOP},
+       {"displayUnifiedDesktopOn", IDS_SETTINGS_DISPLAY_UNIFIED_DESKTOP_ON},
+       {"displayUnifiedDesktopOff", IDS_SETTINGS_DISPLAY_UNIFIED_DESKTOP_OFF},
++      {"displayOutputPortsTitle", IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_TITLE},
++      {"displayOutputPortsSublabel", IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_SUBLABEL},
+       {"displayResolutionTitle", IDS_SETTINGS_DISPLAY_RESOLUTION_TITLE},
+       {"displayResolutionText", IDS_SETTINGS_DISPLAY_RESOLUTION_TEXT},
+       {"displayResolutionTextBest", IDS_SETTINGS_DISPLAY_RESOLUTION_TEXT_BEST},
+diff --git a/fydeos/i18n/chrome/app/os_settings_strings.grdp b/fydeos/i18n/chrome/app/os_settings_strings.grdp
+index c64ed5258e1e6..a4daed4fd00f8 100644
+--- a/fydeos/i18n/chrome/app/os_settings_strings.grdp
++++ b/fydeos/i18n/chrome/app/os_settings_strings.grdp
+@@ -131,5 +131,11 @@
+   <message name="IDS_OS_SETTINGS_FYDEOS_OTA_DISALLOWED_REQUIRES_ONE_TIME_PAYMENT" desc="message of ota disallowed requires one time payment">
+     A new milestone version of FydeOS is available to update now. You need to pay a one-off fee to continue with this update.
+   </message>
++  <message name="IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_TITLE" desc="title of os-settings display output ports">
++    Output ports
++  </message>
++  <message name="IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_SUBLABEL" desc="sublabel of os-settings display output ports">
++    Combination of ports to output, a reboot is needed for this to take effect
++  </message>
+ </if>
+ </grit-part>
+diff --git a/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb b/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb
+index cf8c8c8908a58..656a029394543 100644
+--- a/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb
++++ b/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb
+@@ -145,6 +145,8 @@
+ <translation id="8180845003886240840">自动登录选项仅限于「本地账户」类型，目前账户类型无法开启</translation>
+ <translation id="595136526907376719">FydeOS 大版本更新已上线。如需进行 FydeOS 的大版本升级，请支付一次性更新费用后，再次检查更新。</translation>
+ <translation id="376676483415835736">有新版本的 FydeOS 可供升级，但你的 FydeOS for You 订阅已过期。如需升级 FydeOS，请考虑续费。</translation>
++<translation id="1398519962280469791">输出端口</translation>
++<translation id="2529841670327044926">用来输出图像的端口组合，重启后生效</translation>
+ <!-- chromeos_strings.override.grdp -->
+ <translation id="8239438288189301569">拍摄新照片，或者选择现有照片或图标。
+     <ph name="LINE_BREAK" />
