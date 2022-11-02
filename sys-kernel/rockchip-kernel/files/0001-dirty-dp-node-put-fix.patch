@@ -1,0 +1,17 @@
+diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
+index 2d72ddcf534f..a4199023a75d 100644
+--- a/drivers/of/dynamic.c
++++ b/drivers/of/dynamic.c
+@@ -36,6 +36,12 @@ EXPORT_SYMBOL(of_node_get);
+  */
+ void of_node_put(struct device_node *node)
+ {
++  if (node && (!strcmp("/dp@fec00000/ports/port/endpoint@0", node->full_name) ||
++	       !strcmp("/dp@fec00000/ports/port/endpoint@1", node->full_name) ||
++	       !strcmp("/hdmi@ff940000/ports/port/endpoint@1", node->full_name))) {
++    return;
++  }
++
+ 	if (node)
+ 		kobject_put(&node->kobj);
+ }
