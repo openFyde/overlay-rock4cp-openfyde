@@ -14,8 +14,7 @@ setenv bootargs rootwait ro cros_debug cros_secure cros_legacy console=ttyS2,150
 
 load ${devtype} ${devnum}:${rootpart} ${fdt_addr_r} ${fdtfile}
 
-setenv distro_bootpart 1
-if load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} /unencrypted/overlays.txt; then
+if load ${devtype} ${devnum}:1 ${kernel_addr_r} /unencrypted/overlays.txt; then
    env import -t ${kernel_addr_r} $filesize}
    fdt addr ${fdt_addr_r}
    fdt resize
