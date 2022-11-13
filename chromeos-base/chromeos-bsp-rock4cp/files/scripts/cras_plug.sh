@@ -18,6 +18,18 @@ is_output_avaiable()
     fi
 }
 
+is_input_avaiable()
+{
+    # One line for header and one line for an avaible node
+    cras_test_client  | grep 'Input Nodes' -b2 | grep -q 'Attached clients'
+
+    if [ $? -eq 0 ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 # cras needs sometime to scan output devices and nodes.
 # sleep to wait for them.
 wait_for_output_nodes()
@@ -29,6 +41,20 @@ wait_for_output_nodes()
         sleep 1
         count=$((count+1))
         is_output_avaiable && return 0
+    done
+
+    return 1
+}
+
+wait_for_input_nodes()
+{
+    local ready=0 # 0 for not ready
+    local count=0
+
+    while [ $count -lt $retry_times ]; do
+        sleep 1
+        count=$((count+1))
+        is_input_avaiable && return 0
     done
 
     return 1
@@ -54,4 +80,5 @@ unplug_node()
 }
 
 wait_for_output_nodes || exit 1
+wait_for_input_nodes || exit 1
 plug_node $1
