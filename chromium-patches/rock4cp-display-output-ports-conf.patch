@@ -5,8 +5,6 @@ Signed-off-by: Fangzhou Chen <fangzhou@fydeos.io>
 
 useful for board `rock4cp-openfyde` and `rock4cp-fydeos`.
 
-diff --git a/chrome/browser/resources/settings/chromeos/device_page/display.html b/chrome/browser/resources/settings/chromeos/device_page/display.html
-index 6c19ebacc6fdb..ee6614d138b2f 100644
 --- a/chrome/browser/resources/settings/chromeos/device_page/display.html
 +++ b/chrome/browser/resources/settings/chromeos/device_page/display.html
 @@ -166,6 +166,22 @@
@@ -32,11 +30,9 @@ index 6c19ebacc6fdb..ee6614d138b2f 100644
    <!-- Drop down select menu for resolution -->
    <template is="dom-if"
        if="[[showDropDownResolutionSetting_(selectedDisplay)]]" restamp>
-diff --git a/chrome/browser/resources/settings/chromeos/device_page/display.js b/chrome/browser/resources/settings/chromeos/device_page/display.js
-index 6a090c29b4168..dcff27b64a838 100644
 --- a/chrome/browser/resources/settings/chromeos/device_page/display.js
 +++ b/chrome/browser/resources/settings/chromeos/device_page/display.js
-@@ -61,6 +61,85 @@ const NightLightScheduleType = {
+@@ -61,6 +61,85 @@
    CUSTOM: 2,
  };
  
@@ -122,11 +118,10 @@ index 6a090c29b4168..dcff27b64a838 100644
  Polymer({
    _template: html`{__html_template__}`,
    is: 'settings-display',
-@@ -224,6 +303,33 @@ Polymer({
-       },
+@@ -225,6 +304,33 @@
      },
  
-+    /** @private */
+     /** @private */
 +    outputPortsCombinationList_: {
 +      type: Array,
 +      value() {
@@ -153,10 +148,11 @@ index 6a090c29b4168..dcff27b64a838 100644
 +      value: true,
 +    },
 +
-     /** @private */
++    /** @private */
      shouldOpenCustomScheduleCollapse_: {
        type: Boolean,
-@@ -307,6 +413,9 @@ Polymer({
+       value: false,
+@@ -307,6 +413,9 @@
    /** @private {?DevicePageBrowserProxy} */
    browserProxy_: null,
  
@@ -166,7 +162,7 @@ index 6a090c29b4168..dcff27b64a838 100644
    /** @private {string} */
    invalidDisplayId_: loadTimeData.getString('invalidDisplayId'),
  
-@@ -333,6 +442,7 @@ Polymer({
+@@ -333,6 +442,7 @@
    /** @override */
    created() {
      this.browserProxy_ = DevicePageBrowserProxyImpl.getInstance();
@@ -174,7 +170,7 @@ index 6a090c29b4168..dcff27b64a838 100644
    },
  
    /** @override */
-@@ -343,6 +453,7 @@ Polymer({
+@@ -343,6 +453,7 @@
  
      this.getDisplayInfo_();
      this.$.displaySizeSlider.updateValueInstantly = false;
@@ -182,7 +178,7 @@ index 6a090c29b4168..dcff27b64a838 100644
    },
  
    /** @override */
-@@ -1496,4 +1607,39 @@ Polymer({
+@@ -1496,4 +1607,39 @@
            this.displays, this.layouts, this.mirroringDestinationIds);
      }
    },
@@ -222,11 +218,9 @@ index 6a090c29b4168..dcff27b64a838 100644
 +    await this.displayOutputPortsController_.setOutputPorts(combination);
 +  }
  });
-diff --git a/chrome/browser/ui/webui/settings/chromeos/device_section.cc b/chrome/browser/ui/webui/settings/chromeos/device_section.cc
-index 0e8896ce96e56..86535b2af379d 100644
 --- a/chrome/browser/ui/webui/settings/chromeos/device_section.cc
 +++ b/chrome/browser/ui/webui/settings/chromeos/device_section.cc
-@@ -639,6 +639,8 @@ void AddDeviceDisplayStrings(content::WebUIDataSource* html_source) {
+@@ -639,6 +639,8 @@
        {"displayUnifiedDesktop", IDS_SETTINGS_DISPLAY_UNIFIED_DESKTOP},
        {"displayUnifiedDesktopOn", IDS_SETTINGS_DISPLAY_UNIFIED_DESKTOP_ON},
        {"displayUnifiedDesktopOff", IDS_SETTINGS_DISPLAY_UNIFIED_DESKTOP_OFF},
@@ -235,30 +229,26 @@ index 0e8896ce96e56..86535b2af379d 100644
        {"displayResolutionTitle", IDS_SETTINGS_DISPLAY_RESOLUTION_TITLE},
        {"displayResolutionText", IDS_SETTINGS_DISPLAY_RESOLUTION_TEXT},
        {"displayResolutionTextBest", IDS_SETTINGS_DISPLAY_RESOLUTION_TEXT_BEST},
-diff --git a/fydeos/i18n/chrome/app/os_settings_strings.grdp b/fydeos/i18n/chrome/app/os_settings_strings.grdp
-index c64ed5258e1e6..a4daed4fd00f8 100644
 --- a/fydeos/i18n/chrome/app/os_settings_strings.grdp
 +++ b/fydeos/i18n/chrome/app/os_settings_strings.grdp
-@@ -131,5 +131,11 @@
-   <message name="IDS_OS_SETTINGS_FYDEOS_OTA_DISALLOWED_REQUIRES_ONE_TIME_PAYMENT" desc="message of ota disallowed requires one time payment">
-     A new milestone version of FydeOS is available to update now. You need to pay a one-off fee to continue with this update.
-   </message>
-+  <message name="IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_TITLE" desc="title of os-settings display output ports">
-+    Output ports
-+  </message>
-+  <message name="IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_SUBLABEL" desc="sublabel of os-settings display output ports">
-+    Combination of ports to output, a reboot is needed for this to take effect
-+  </message>
+@@ -158,5 +158,11 @@
+    <message name="IDS_OS_SETTINGS_FYDEOS_SETTINGS_FYDEOS_LICENSE_INFO_RETRY_WEBVIEW_BUTTON" desc="text of retry webview button in license page">
+      Check your subscription online
+    </message>
++   <message name="IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_TITLE" desc="title of os-settings display output ports">
++     Output ports
++   </message>
++   <message name="IDS_SETTINGS_DISPLAY_OUTPUT_PORTS_SUBLABEL" desc="sublabel of os-settings display output ports">
++     Combination of ports to output, a reboot is needed for this to take effect
++   </message>
  </if>
  </grit-part>
-diff --git a/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb b/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb
-index cf8c8c8908a58..656a029394543 100644
 --- a/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb
 +++ b/fydeos/i18n/chrome/app/resources/generated_resources_zh-CN.xtb
-@@ -145,6 +145,8 @@
- <translation id="8180845003886240840">自动登录选项仅限于「本地账户」类型，目前账户类型无法开启</translation>
- <translation id="595136526907376719">FydeOS 大版本更新已上线。如需进行 FydeOS 的大版本升级，请支付一次性更新费用后，再次检查更新。</translation>
- <translation id="376676483415835736">有新版本的 FydeOS 可供升级，但你的 FydeOS for You 订阅已过期。如需升级 FydeOS，请考虑续费。</translation>
+@@ -151,6 +151,8 @@
+ <translation id="7384698100459834045">订阅有效期</translation>
+ <translation id="3354919960795782984">设备识别码</translation>
+ <translation id="5758632069869992306">联网查看订阅信息</translation>
 +<translation id="1398519962280469791">输出端口</translation>
 +<translation id="2529841670327044926">用来输出图像的端口组合，重启后生效</translation>
  <!-- chromeos_strings.override.grdp -->
